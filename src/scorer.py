@@ -1,5 +1,6 @@
 import pandas as pd
 import logging
+import pickle
 from catboost import CatBoostClassifier
 
 # Настройка логгера
@@ -9,7 +10,8 @@ logger.info('Importing pretrained model...')
 
 # Import model
 model = CatBoostClassifier()
-model.load_model('./models/my_catboost.cbm')
+with open('./models/catboost.pickle', 'rb') as handle:
+    model = pickle.load(handle)
 
 # Define optimal threshold
 model_th = 0.98
@@ -26,4 +28,4 @@ def make_pred(dt, path_to_file):
     logger.info('Prediction complete for file: %s', path_to_file)
 
     # Return proba for positive class
-    return submission
+    return submission, model.predict_proba(dt)[:, 1]
